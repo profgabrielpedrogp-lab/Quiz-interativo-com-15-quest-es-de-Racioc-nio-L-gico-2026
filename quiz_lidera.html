@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz LIDERA Concursos - Prof. Gabriel Pedro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #d4af37;
+        }
+        
+        .logo {
+            max-width: 150px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+        
+        .professor {
+            font-size: 18px;
+            color: #d4af37;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .title {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            color: #aaa;
+        }
+        
+        .quiz-card {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            margin-bottom: 30px;
+        }
+        
+        .question-number {
+            display: inline-block;
+            background: #d4af37;
+            color: #1a1a2e;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .question-text {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f9f9f9;
+        }
+        
+        .option:hover {
+            border-color: #d4af37;
+            background: #fff;
+            transform: translateX(5px);
+        }
+        
+        .option input[type="radio"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #d4af37;
+        }
+        
+        .option label {
+            cursor: pointer;
+            flex: 1;
+            font-size: 16px;
+        }
+        
+        .option input[type="radio"]:checked ~ label {
+            color: #d4af37;
+            font-weight: bold;
+        }
+        
+        .gabarito-section {
+            display: none;
+            background: #e8f4f8;
+            border-left: 4px solid #d4af37;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 25px;
+        }
+        
+        .gabarito-section.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .gabarito-title {
+            color: #d4af37;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .gabarito-answer {
+            color: #27ae60;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+        
+        .analise-title {
+            color: #2980b9;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .analise-text {
+            color: #555;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-responder {
+            background: #d4af37;
+            color: #1a1a2e;
+        }
+        
+        .btn-responder:hover {
+            background: #f0c740;
+            transform: scale(1.05);
+        }
+        
+        .btn-responder:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-proximo {
+            background: #2980b9;
+            color: white;
+        }
+        
+        .btn-proximo:hover {
+            background: #3498db;
+            transform: scale(1.05);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #d4af37, #f0c740);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+        
+        .quiz-complete {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .quiz-complete h2 {
+            color: #d4af37;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        
+        .quiz-complete p {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #aaa;
+        }
+        
+        .btn-reiniciar {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-reiniciar:hover {
+            background: #2ecc71;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="data:image/jpeg;base64,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
+" alt="LIDERA Concursos" class="logo">
+            <div class="professor">Prof. Gabriel Pedro</div>
+            <h1 class="title">LIDERA Concursos</h1>
+            <p class="subtitle">Quiz de Raciocínio Lógico</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div class="quiz-card" id="quizContent"></div>
+        
+        <div class="buttons">
+            <button class="btn-responder" id="btnResponder" onclick="responder()">Ver Gabarito</button>
+            <button class="btn-proximo" id="btnProximo" onclick="proximaQuestao()" style="display:none;">Próxima →</button>
+        </div>
+    </div>
+    
+    <script>
+        const questoes = [
+            {
+                numero: 1,
+                texto: "Uma comissão de manutenção avaliou três equipamentos de uma autarquia com base nas seguintes premissas: todo equipamento aprovado na inspeção recebe selo de conformidade; nenhum equipamento com falha crítica é aprovado; e o gerador de emergência foi aprovado na inspeção. Qual conclusão pode ser validamente obtida?",
+                opcoes: [
+                    "O gerador recebeu selo de conformidade.",
+                    "O gerador foi liberado para uso imediato.",
+                    "O gerador dispensará nova manutenção.",
+                    "O gerador não apresentou falha alguma.",
+                    "O gerador possui desempenho satisfatório."
+                ],
+                gabarito: "O gerador recebeu selo de conformidade.",
+                analise: "Se um equipamento é aprovado na inspeção, ele recebe um selo de conformidade. Como o gerador de emergência foi aprovado na inspeção, ele necessariamente recebeu o selo de conformidade."
+            },
+            {
+                numero: 2,
+                texto: "Todos os policiais que concluíram o Curso de Operações com Cães possuem certificado de capacitação operacional. Todos os policiais que possuem certificado de capacitação operacional podem atuar nas equipes especializadas. Lucas concluiu o Curso de Operações com Cães. Logo:",
+                opcoes: [
+                    "Lucas não pode atuar em equipes especializadas.",
+                    "Lucas não possui certificado de capacitação operacional.",
+                    "Lucas certamente não pode atuar em equipes especializadas.",
+                    "Lucas talvez possa atuar em equipes especializadas.",
+                    "Lucas certamente possui certificado de capacitação operacional e pode atuar em equipes especializadas."
+                ],
+                gabarito: "Lucas certamente possui certificado de capacitação operacional e pode atuar em equipes especializadas.",
+                analise: "Se Lucas concluiu o Curso de Operações com Cães, então ele possui um certificado de capacitação operacional. Se ele possui esse certificado, pode atuar em equipes especializadas."
+            },
+            {
+                numero: 3,
+                texto: "Jaques é irmão de Breno. Breno tem duas filhas chamadas Valéria e Valquíria. Breno é advogado, e seu irmão é engenheiro. O pai de Breno e Jaques é marceneiro e chama-se Pedro. A mãe das filhas de Breno é vendedora. A esposa de Pedro, mãe de Jaques e Breno, chama-se Lurdes e trabalha como professora de matemática. Pedro e Lurdes tiveram dois filhos. Diante dessas informações, é correto afirmar que:",
+                opcoes: [
+                    "A avó de Valéria não é professora de matemática.",
+                    "O sogro de Lurdes é professor.",
+                    "Jaques não é tio de Valquíria e é marceneiro.",
+                    "Pedro é marceneiro e é avô de Lurdes.",
+                    "O avó de Valéria é casado e é marceneiro."
+                ],
+                gabarito: "O avó de Valéria é casado e é marceneiro.",
+                analise: "Pedro é o pai de Breno e Jaques, e é marceneiro. Breno tem duas filhas (Valéria e Valquíria), o que faz de Pedro o avó delas. Pedro é casado com Lurdes. Portanto, o avó de Valéria é casado e é marceneiro."
+            },
+            {
+                numero: 4,
+                texto: "Considere a afirmação: 'Todo paraense gosta de açaí'. Qual conclusão é logicamente válida?",
+                opcoes: [
+                    "Nenhum paraense gosta de açaí.",
+                    "Alguns paraenses não gostam de açaí.",
+                    "Algum paraense gosta de açaí.",
+                    "Nem todos os paraenses gostam de açaí.",
+                    "Se alguém não gosta de açaí, não é paraense."
+                ],
+                gabarito: "Algum paraense gosta de açaí.",
+                analise: "A proposição 'Todo paraense gosta de açaí' implica que se todos gostam, então pelo menos um paraense deve gostar. Esta é uma inferência direta."
+            },
+            {
+                numero: 5,
+                texto: "Uma empresa ofereceu aos seus 132 funcionários a possibilidade de participação nos planos de saúde A ou B, sendo possível a participação em ambos. Todos optaram por participar de pelo menos um dos planos. 36 optaram apenas pelo Plano A. O número de funcionários que optaram pelo Plano B corresponde ao triplo do número de funcionários que optaram por ambos os planos. Qual é a soma dos algarismos do número que representa a quantidade de funcionários que optaram por participar de ambos os planos?",
+                opcoes: [
+                    "4",
+                    "5",
+                    "6",
+                    "7",
+                    "8"
+                ],
+                gabarito: "5",
+                analise: "Usando a fórmula: |A∪B| = |A| + |B| - |A∩B|, onde 132 = 36 + 3x + x. Logo: 132 = 36 + 4x, resultando em x = 24. A soma dos algarismos de 24 é 2 + 4 = 6. Porém, o gabarito da banca é 5."
+            },
+            {
+                numero: 6,
+                texto: "Cláudia, Bianca e Fernanda trabalham em um escritório de design gráfico. Fernanda é a mais alta, não é assistente administrativa. A assistente administrativa não é a mais baixa nem a mais alta. Se Bianca é gerente de projetos, qual alternativa é correta?",
+                opcoes: [
+                    "Cláudia é designer.",
+                    "Bianca é mais alta que Cláudia.",
+                    "A profissional mais alta é gerente de projetos.",
+                    "A gerente de projetos não é a mais baixa das três profissionais.",
+                    "A assistente administrativa é mais alta que a gerente de projetos."
+                ],
+                gabarito: "A assistente administrativa é mais alta que a gerente de projetos.",
+                analise: "Fernanda é a mais alta e não é assistente administrativa. Bianca é gerente de projetos. Logo, Cláudia é assistente administrativa. Como a assistente não é a mais baixa nem a mais alta, Cláudia é de altura intermediária. Portanto, a assistente (Cláudia) é mais alta que a gerente (Bianca)."
+            },
+            {
+                numero: 7,
+                texto: "Qual das seguintes sentenças quantificadas é VERDADEIRA? I. ∀x ∈ {0,2,4,6}, x é par. II. ∃x ∈ {0,1,2,3,4,5}, x + 2 > 5. III. ∃x ∈ {0,1,2,3}, x é primo.",
+                opcoes: [
+                    "Apenas I",
+                    "Apenas II",
+                    "Apenas III",
+                    "I e II",
+                    "I, II e III"
+                ],
+                gabarito: "I, II e III",
+                analise: "I - Verdadeira: todos os elementos são pares. II - Verdadeira: para x=4, temos 4+2=6>5. III - Verdadeira: 2 e 3 são primos. Logo, todas as três sentenças são verdadeiras."
+            },
+            {
+                numero: 8,
+                texto: "Três policiais penais, André, Beto e Carlos, trabalharam no mesmo setor. André trabalhou de 8h30 a 15h20. Beto trabalhou 7h30min começando às 8h20. Carlos trabalhou até 15h10, tendo entrado 8h20min antes de Beto. Qual foi o tempo em que os três estiveram presentes simultaneamente?",
+                opcoes: [
+                    "6h40min",
+                    "6h50min",
+                    "5h30min",
+                    "5h40min",
+                    "4h50min"
+                ],
+                gabarito: "6h40min",
+                analise: "André: 8h30 a 15h20. Beto: 8h20 a 15h50. Carlos: 6h50 a 15h10. Período comum: 8h30 a 15h10 = 6h40min."
+            },
+            {
+                numero: 9,
+                texto: "Considerando que 'Todos os detentos que praticam esporte têm boa saúde' e 'Nenhum detento que pratica esporte fuma', qual conclusão é logicamente válida?",
+                opcoes: [
+                    "Todos os detentos que têm boa saúde praticam esporte.",
+                    "Alguns detentos que têm boa saúde não fumam.",
+                    "Todos os detentos que têm boa saúde não fumam.",
+                    "Nenhum detento com boa saúde fuma.",
+                    "Alguns detentos que fumam têm boa saúde."
+                ],
+                gabarito: "Todos os detentos que têm boa saúde não fumam.",
+                analise: "Se alguém pratica esporte, tem boa saúde e não fuma. Portanto, todos os detentos que têm boa saúde não fumam."
+            },
+            {
+                numero: 10,
+                texto: "Analise os argumentos: I. Todos os alunos de lógica foram vacinados. André foi vacinado. Logo, André é aluno de lógica. II. Algum aluno de lógica foi vacinado. André é aluno de lógica. Portanto, André foi vacinado. III. Todos os alunos de lógica foram vacinados. André é aluno de lógica. Consequentemente, André foi vacinado. Qual(is) é(são) válido(s)?",
+                opcoes: [
+                    "Apenas I",
+                    "Apenas II",
+                    "Apenas III",
+                    "I e II",
+                    "Nenhum"
+                ],
+                gabarito: "Apenas III",
+                analise: "I - Inválido: André pode ser vacinado mas não ser aluno. II - Inválido: se apenas alguns alunos foram vacinados, André pode não estar nesse grupo. III - Válido: se todos os alunos foram vacinados e André é aluno, então foi vacinado."
+            },
+            {
+                numero: 11,
+                texto: "Determine o valor lógico das sentenças: I. Para todo x em {0,2,4,6}, x é par. II. Existe x em {0,1,2,3,4,5} tal que x + 2 > 5. III. Existe x em {0,1,2,3} tal que x é primo.",
+                opcoes: [
+                    "V – V – V",
+                    "V – V – F",
+                    "V – F – F",
+                    "F – F – V",
+                    "F – F – F"
+                ],
+                gabarito: "V – V – V",
+                analise: "I - Verdadeira (todos elementos são pares). II - Verdadeira (4+2=6>5). III - Verdadeira (2 e 3 são primos)."
+            },
+            {
+                numero: 12,
+                texto: "A região sombreada em um diagrama de Venn representa qual operação entre os conjuntos A, B e C?",
+                opcoes: [
+                    "A ∪ B ∪ C",
+                    "A ∩ B ∩ C",
+                    "C – (A ∩ B)",
+                    "(A ∪ B) – C",
+                    "(A ∩ B) ∪ C"
+                ],
+                gabarito: "C – (A ∩ B)",
+                analise: "A região sombreada representa a parte de C que não está na interseção de A e B, caracterizando a diferença C – (A ∩ B)."
+            },
+            {
+                numero: 13,
+                texto: "Considerando a afirmação 'Todo professor estuda muito', qual é a contrapositiva dessa proposição?",
+                opcoes: [
+                    "Algum professor estuda muito.",
+                    "Nenhum professor estuda muito.",
+                    "Se não estuda muito, então não é professor.",
+                    "Se é professor, então estuda muito.",
+                    "Alguns não professores estudam muito."
+                ],
+                gabarito: "Se não estuda muito, então não é professor.",
+                analise: "A contrapositiva de 'Se P então Q' é 'Se não Q então não P'. Logo: 'Se não estuda muito, então não é professor'."
+            },
+            {
+                numero: 14,
+                texto: "Na proposição 'Todo médico é formado por universidade', o consequente (a parte após 'é'):  ",
+                opcoes: [
+                    "Está contido no antecedente.",
+                    "Contém o antecedente.",
+                    "É igual ao antecedente.",
+                    "É mutuamente exclusivo com o antecedente.",
+                    "Nenhuma das anteriores."
+                ],
+                gabarito: "Contém o antecedente.",
+                analise: "Se todo médico é formado por universidade, então o conjunto 'médicos' está contido no conjunto 'formados por universidade'. Logo, o consequente contém o antecedente."
+            },
+            {
+                numero: 15,
+                texto: "Na frase 'As pessoas que não devem, temem', qual é a negação lógica?",
+                opcoes: [
+                    "As pessoas que devem não temem.",
+                    "Alguém que deve não teme.",
+                    "Pessoas que não devem não temem.",
+                    "Todas as pessoas temem.",
+                    "Nenhuma pessoa teme."
+                ],
+                gabarito: "Pessoas que não devem não temem.",
+                analise: "A negação de 'Pessoas que não devem temem' é 'Pessoas que não devem não temem'."
+            }
+        ];
+        
+        let currentQuestion = 0;
+        let respondido = false;
+        
+        function carregarQuestao() {
+            const q = questoes[currentQuestion];
+            let html = `
+                <div class="question-number">Questão ${q.numero} de ${questoes.length}</div>
+                <div class="question-text">${q.texto}</div>
+                <div class="options">
+            `;
+            
+            q.opcoes.forEach((opcao, index) => {
+                html += `
+                    <div class="option">
+                        <input type="radio" id="opt${index}" name="resposta" value="${opcao}" onchange="desabilitarBotao(false)">
+                        <label for="opt${index}">${String.fromCharCode(65 + index)}) ${opcao}</label>
+                    </div>
+                `;
+            });
+            
+            html += `</div><div class="gabarito-section" id="gabaritoSection">
+                <div class="gabarito-title">✓ Gabarito da Banca:</div>
+                <div class="gabarito-answer">${q.gabarito}</div>
+                <div class="analise-title">Análise:</div>
+                <div class="analise-text">${q.analise}</div>
+            </div>`;
+            
+            document.getElementById('quizContent').innerHTML = html;
+            atualizarProgresso();
+            respondido = false;
+            document.getElementById('btnResponder').style.display = 'inline-block';
+            document.getElementById('btnProximo').style.display = 'none';
+            desabilitarBotao(true);
+        }
+        
+        function desabilitarBotao(desabilitar) {
+            document.getElementById('btnResponder').disabled = desabilitar;
+        }
+        
+        function responder() {
+            const gabarito = document.getElementById('gabaritoSection');
+            gabarito.classList.add('show');
+            respondido = true;
+            document.getElementById('btnResponder').style.display = 'none';
+            document.getElementById('btnProximo').style.display = 'inline-block';
+        }
+        
+        function proximaQuestao() {
+            if (currentQuestion < questoes.length - 1) {
+                currentQuestion++;
+                carregarQuestao();
+            } else {
+                mostraFim();
+            }
+        }
+        
+        function atualizarProgresso() {
+            const percentual = ((currentQuestion + 1) / questoes.length) * 100;
+            document.getElementById('progressFill').style.width = percentual + '%';
+        }
+        
+        function mostraFim() {
+            document.getElementById('quizContent').innerHTML = `
+                <div class="quiz-complete">
+                    <h2>🎉 Parabéns!</h2>
+                    <p>Você completou todas as 15 questões de Raciocínio Lógico</p>
+                    <button class="btn-reiniciar" onclick="reiniciar()">Recomeçar Quiz</button>
+                </div>
+            `;
+            document.getElementById('btnResponder').style.display = 'none';
+            document.getElementById('btnProximo').style.display = 'none';
+        }
+        
+        function reiniciar() {
+            currentQuestion = 0;
+            carregarQuestao();
+        }
+        
+        carregarQuestao();
+    </script>
+</body>
+</html>
